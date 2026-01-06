@@ -6,14 +6,14 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 2600);
+    const t = setTimeout(() => setLoading(false), 3600);
     return () => clearTimeout(t);
   }, []);
 
   return (
     <>
       {/* HERO ALWAYS RENDERED */}
-      <Hero />
+      <Hero ready={!loading} />
 
       {/* LOADER ON TOP */}
       <Loader isLoading={loading} />
