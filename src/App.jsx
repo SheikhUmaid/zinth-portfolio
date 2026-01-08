@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import Loader from "./components/Loader";
 import Hero from "./components/Hero";
+import Header from "./components/Header";
+import ManifestoSection from "./components/Manifesto";
+import MarqueeSection from "./components/MarqueeSection";
+import CaseStudySection from "./components/CaseStudySection";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -12,11 +16,13 @@ export default function App() {
 
   return (
     <>
-      {/* HERO ALWAYS RENDERED */}
+      <Header ready={!loading} />
       <Hero ready={!loading} />
-
-      {/* LOADER ON TOP */}
+      <div className="h-2 bg-black" />
       <Loader isLoading={loading} />
+      <ManifestoSection />
+      <MarqueeSection />
+      <CaseStudySection />
     </>
   );
 }
