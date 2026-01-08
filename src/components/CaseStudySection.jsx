@@ -1,114 +1,218 @@
-export default function CaseStudySection() {
-  return (
-    <section className="relative bg-black px-6 sm:px-10 py-20">
-      <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1.4fr] gap-10 lg:gap-16">
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useMotionValueEvent,
+} from "framer-motion";
+import { useRef, useState } from "react";
+import { caseStudies } from "../data/data";
 
-        {/* LEFT PANEL */}
-        <div className="relative bg-black/60 border border-white/10 rounded-2xl p-8 sm:p-10 backdrop-blur">
-          
-          {/* Project selector */}
-          <div className="flex items-center justify-between mb-10">
-            <div className="space-y-2 text-sm text-white/50">
-              <div className="flex items-center gap-2 text-white">
-                <span className="w-2 h-2 bg-zinthOrange rounded-full" />
-                KRESNA
+export default function CaseStudySection() {
+  const sectionRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const total = caseStudies.length;
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+
+  const indexMV = useTransform(scrollYProgress, [0, 1], [0, total - 1]);
+
+  useMotionValueEvent(indexMV, "change", (latest) => {
+    const rounded = Math.round(latest);
+    if (rounded !== activeIndex && rounded >= 0 && rounded < total) {
+      setActiveIndex(rounded);
+    }
+  });
+
+  const panelY = useTransform(scrollYProgress, [0, 1], ["0%", "6%"]);
+
+  const reveal = useTransform(
+    scrollYProgress,
+    [activeIndex / total, (activeIndex + 1) / total],
+    [100, 0],
+    { clamp: true }
+  );
+
+  const clipPathMV = useTransform(reveal, (v) => {
+    return `inset(${v}% 0% 0% 0%)`;
+  });
+
+  const current = caseStudies[activeIndex];
+  const next = caseStudies[activeIndex + 1];
+
+  return (
+    <section
+      ref={sectionRef}
+      className="relative bg-black"
+      style={{ height: `${(total + 1) * 100}vh` }}
+    >
+      {/* STICKY WRAPPER */}
+      <div className="sticky top-0 h-screen px-4 lg:px-6">
+        <div
+          className="
+            max-w-[2200px] mx-auto
+            grid grid-cols-1 lg:grid-cols-[1.25fr_2fr]
+            gap-12 xl:gap-16
+            h-full items-center
+          "
+        >
+          {/* LEFT PANEL — MATCH IMAGE HEIGHT */}
+          <motion.div
+            style={{ y: panelY }}
+            className="
+              relative
+              h-[720px] xl:h-[820px]
+              bg-black/85
+              border border-white/15
+              rounded-xl
+              p-16 xl:p-18
+              backdrop-blur
+              shadow-[0_30px_90px_rgba(0,0,0,0.75)]
+              flex flex-col justify-between
+            "
+          >
+            {/* TOP SECTION */}
+            <div>
+              {/* PROJECT LIST */}
+              <div className="flex justify-between mb-16">
+                <div className="space-y-3 text-base">
+                  {caseStudies.map((p, i) => (
+                    <div
+                      key={p.id}
+                      className={`flex items-center gap-3 transition-opacity duration-300 ${
+                        activeIndex === i ? "opacity-100" : "opacity-40"
+                      }`}
+                    >
+                      <span className="w-2.5 h-2.5 bg-zinthOrange rounded-full" />
+                      {p.id.toUpperCase()}
+                    </div>
+                  ))}
+                </div>
+
+                <span className="text-zinthOrange text-base">
+                  All Projects ↗
+                </span>
               </div>
-              <div>PANDAWA</div>
-              <div>SADEWA</div>
+
+              {/* CONTENT */}
+              <div className="relative min-h-[460px]">
+                {caseStudies.map((project, i) => (
+                  <motion.div
+                    key={project.id}
+                    className="absolute inset-0"
+                    initial={false}
+                    animate={{
+                      opacity: activeIndex === i ? 1 : 0,
+                      y: activeIndex === i ? 0 : 28,
+                    }}
+                    transition={{ duration: 0.45, ease: "easeOut" }}
+                  >
+                    {/* LABEL */}
+                    <div
+                      className="mb-6 text-white/50"
+                      style={{
+                        fontFamily: "Shadows Into Light",
+                        fontSize: "1.6rem",
+                        letterSpacing: "0.1em",
+                      }}
+                    >
+                      {project.label}
+                    </div>
+
+                    {/* TITLE — BIGGER */}
+                    <h3
+                      className="text-white mb-12"
+                      style={{
+                        fontFamily: "ClashDisplay",
+                        fontSize: "clamp(3.4rem, 4.6vw, 4.4rem)",
+                        lineHeight: "1.05",
+                        letterSpacing: "-0.02em",
+                      }}
+                    >
+                      {project.title}
+                    </h3>
+
+                    {/* META */}
+                    <div className="space-y-5 text-base text-white/60 border-t border-white/10 pt-8">
+                      <div className="flex justify-between">
+                        <span>Year</span>
+                        <span className="text-white">{project.year}</span>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span>Timeline</span>
+                        <span className="text-white">{project.timeline}</span>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span>Services</span>
+                        <div className="flex gap-3 flex-wrap justify-end">
+                          {project.services.map((s) => (
+                            <span
+                              key={s}
+                              className="px-4 py-1.5 rounded-full bg-white/5 text-white text-sm"
+                            >
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
+            {/* CTA — BOTTOM ALIGNED */}
             <a
               href="#"
-              className="text-zinthOrange text-sm font-medium inline-flex items-center gap-2"
+              className="
+                mt-12 inline-flex items-center justify-between
+                w-full px-8 py-5
+                rounded-lg
+                border border-white/30
+                text-white text-base
+                hover:bg-white/5
+                hover:border-white/50
+                transition
+              "
             >
-              All Projects →
+              <span>Read Case Study</span>
+              <span>↗</span>
             </a>
-          </div>
+          </motion.div>
 
-          {/* Title */}
-          <h3
-            className="text-white mb-10"
-            style={{
-              fontFamily: "ClashDisplay",
-              fontSize: "clamp(1.8rem, 3.5vw, 3rem)",
-              lineHeight: "1.1",
-            }}
-          >
-            Website and Branding
-            <br />
-            for Kresna Agency
-          </h3>
-
-          {/* Meta info */}
-          <div className="space-y-4 text-sm text-white/60 border-t border-white/10 pt-6">
-            <div className="flex justify-between">
-              <span>Year</span>
-              <span className="text-white">2023</span>
-            </div>
-
-            <div className="flex justify-between">
-              <span>Timeline</span>
-              <span className="text-white">5 Weeks</span>
-            </div>
-
-            <div className="flex justify-between">
-              <span>Services</span>
-              <div className="flex gap-2">
-                <span className="px-3 py-1 rounded-full bg-white/5 text-white">
-                  Branding
-                </span>
-                <span className="px-3 py-1 rounded-full bg-white/5 text-white">
-                  Website
-                </span>
-                <span className="px-3 py-1 rounded-full bg-white/5 text-white">
-                  3D
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <a
-            href="#"
+          {/* RIGHT IMAGE PANEL */}
+          <div
             className="
-              mt-8 inline-flex items-center justify-between
-              w-full px-6 py-4 rounded-xl
-              border border-white/15
-              text-white hover:bg-white/5
-              transition
+              relative
+              h-[720px] xl:h-[820px]
+              rounded-xl
+              overflow-hidden
+              shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]
             "
           >
-            <span>Read Case Study</span>
-            <span>↗</span>
-          </a>
+            {current && (
+              <img
+                src={current.image}
+                alt={current.id}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+
+            {next && (
+              <motion.img
+                src={next.image}
+                alt={next.id}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ clipPath: clipPathMV }}
+              />
+            )}
+          </div>
         </div>
-
-        {/* RIGHT VISUAL */}
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#0b1c2d] to-[#0f5ba7]">
-
-          {/* Image */}
-          <img
-            src="/manifesto.jpg"
-            alt="Kresna Project"
-            className="
-              w-full h-full object-cover
-              scale-[1.02]
-            "
-          />
-
-          {/* Floating accent shape */}
-          <div className="
-            absolute top-10 right-10
-            w-24 h-24
-            bg-gradient-to-br from-blue-400 to-cyan-300
-            rounded-xl
-            blur-sm
-            opacity-90
-          " />
-
-         
-        </div>
-
       </div>
     </section>
   );

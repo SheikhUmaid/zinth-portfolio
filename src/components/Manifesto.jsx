@@ -1,111 +1,130 @@
-// components/Manifesto.jsx - FULL PURE PARALLAX VERSION
-import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useInView,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import { useRef } from "react";
 
-export default function Manifesto({ ready }) {
-  const { scrollY } = useScroll();
-  
-  // PURE PARALLAX (slides OPPOSITE scroll direction)
-  const parallaxY = useTransform(scrollY, [0, 600], [0, 80]);   
-  const parallaxScale = useTransform(scrollY, [0, 600], [1, 1.05]); 
+export default function ManifestoParallaxLayered() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-120px" });
 
-  // TEXT REVEAL
-  const textOpacity = useTransform(scrollY, [50, 300], [0, 1]);
-  const textY = useTransform(scrollY, [50, 300], [60, 0]);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  // STRONGER PARALLAX CURVES
+  const bgY = useTransform(
+    scrollYProgress,
+    [0, 0.5, 1],
+    ["-30%", "0%", "30%"]
+  );
+
+  const textY = useTransform(
+    scrollYProgress,
+    [0, 0.5, 1],
+    ["-10%", "0%", "10%"]
+  );
+
+  // Subtle cinematic scale
+  const bgScale = useTransform(
+    scrollYProgress,
+    [0, 0.5, 1],
+    [1.12, 1.05, 1.12]
+  );
+
+  const container = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.14 } },
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 70 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.9, ease: "easeOut" },
+    },
+  };
 
   return (
-    <section className="relative min-h-screen bg-black overflow-hidden pt-28">
-      
-      {/* PURE PARALLAX IMAGE */}
+    <section
+      ref={ref}
+      className="relative min-h-screen bg-black overflow-hidden pt-28"
+    >
+      {/* BACKGROUND PARALLAX */}
       <motion.div
-        className="absolute inset-0 bg-cover bg-no-repeat bg-bottom"
-        style={{ 
+        style={{
+          y: bgY,
+          scale: bgScale,
           backgroundImage: "url('/manifesto.jpg')",
-          y: parallaxY,
-          scale: parallaxScale,
-          transformOrigin: "center bottom"
         }}
+        className="absolute inset-0 h-[160%] bg-cover bg-center will-change-transform"
       />
 
       {/* OVERLAY */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/90" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black/90" />
 
-      {/* CONTENT */}
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-6 sm:px-10">
-        <motion.div 
-          className="text-center w-full max-w-4xl mx-auto"
-          style={{ opacity: textOpacity, y: textY }}
-          initial={{ opacity: 0, y: 60 }}
-          animate={ready ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 1, ease: "easeOut" }}
+      {/* CONTENT (TEXT PARALLAX) */}
+      <motion.div
+        style={{ y: textY }}
+        className="relative z-10 flex min-h-screen items-center justify-center px-6 will-change-transform"
+      >
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="w-full max-w-5xl mx-auto text-center"
         >
-          {/* MANIFESTO LABEL */}
-          <div
-            className="mb-3 sm:mb-4 text-zinthOrange inline-block"
+          <motion.div
+            variants={item}
+            className="mb-6 text-zinthOrange"
             style={{
               fontFamily: "Shadows Into Light",
-              fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)",
-              letterSpacing: "0.12em",
+              fontSize: "clamp(1.3rem, 2.5vw, 2rem)",
+              letterSpacing: "0.14em",
             }}
           >
             MANIFESTO
-          </div>
+          </motion.div>
 
-          {/* STACKED STATEMENT */}
           <div
             className="uppercase"
             style={{
               fontFamily: "ClashDisplay",
-              fontWeight: 900,
-              lineHeight: "0.82",
+              fontWeight: 700,
+              lineHeight: "1.05",
             }}
           >
-            <div
-              className="text-white"
-              style={{
-                fontSize: "clamp(3.4rem, 10vw, 9.8rem)",
-                letterSpacing: "-0.07em",
-              }}
-            >
-              FORM
-            </div>
-
-            <div
-              className="text-white"
-              style={{
-                fontSize: "clamp(3.4rem, 10vw, 9.8rem)",
-                letterSpacing: "-0.06em",
-              }}
-            >
-              FOLLOWS
-            </div>
-
-            <div
-              className="text-white"
-              style={{
-                fontSize: "clamp(3.4rem, 10vw, 9.8rem)",
-                letterSpacing: "-0.04em",
-              }}
-            >
-              FUNCTION
-            </div>
+            {["FORM", "FOLLOWS", "FUNCTION"].map((word) => (
+              <motion.div
+                key={word}
+                variants={item}
+                className="text-white"
+                style={{
+                  fontSize: "clamp(3.6rem, 8.5vw, 9.6rem)",
+                  letterSpacing: "-0.03em",
+                  marginBottom: "0.16em",
+                  transform: "scaleX(0.88)",
+                  transformOrigin: "center",
+                  opacity: 0.96,
+                }}
+              >
+                {word}
+              </motion.div>
+            ))}
           </div>
 
-          {/* SUBTEXT */}
-          <p
-            className="
-              mt-3 sm:mt-4
-              mx-auto
-              max-w-[300px] sm:max-w-[420px] md:max-w-[480px]
-              text-neutral-300
-              text-[0.9rem] sm:text-base md:text-lg
-              leading-[1.55]
-            "
+          <motion.p
+            variants={item}
+            className="mx-auto mt-6 max-w-[420px] text-neutral-300 text-base md:text-lg leading-[1.6]"
           >
-            We partner with ambitious teams to design and engineer digital
-            products that stand out — technically and visually.
-          </p>
+            We bring unique perspective to help you stand out among the crowd.
+          </motion.p>
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 }

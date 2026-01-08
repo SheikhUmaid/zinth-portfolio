@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import ManifestoSection from "./components/Manifesto";
 import MarqueeSection from "./components/MarqueeSection";
 import CaseStudySection from "./components/CaseStudySection";
+import ServicesSection from "./components/Services";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -23,6 +24,7 @@ export default function App() {
       <ManifestoSection />
       <MarqueeSection />
       <CaseStudySection />
+      <ServicesSection/>
     </>
   );
 }
