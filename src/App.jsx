@@ -6,6 +6,13 @@ import ManifestoSection from "./components/Manifesto";
 import MarqueeSection from "./components/MarqueeSection";
 import CaseStudySection from "./components/CaseStudySection";
 import ServicesSection from "./components/Services";
+import WhyUsSection from "./components/WhyUsSection";
+import StatsParallaxSection from "./components/Stats";
+import TestimonialsSection from "./components/Testimonials";
+import TeamSection from "./components/Team";
+import FAQSection from "./components/FAQSection";
+import BigFooter from "./components/Footer";
+import LatestNewsSection from "./components/Blog";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -25,6 +32,13 @@ export default function App() {
       <MarqueeSection />
       <CaseStudySection />
       <ServicesSection/>
+      <WhyUsSection />
+      <StatsParallaxSection />
+      <TestimonialsSection />
+      <TeamSection />
+      <FAQSection />
+      <LatestNewsSection />
+      <BigFooter />
     </>
   );
 }

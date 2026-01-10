@@ -18,16 +18,11 @@ export default function CaseStudySection() {
     offset: ["start start", "end start"],
   });
 
-  const indexMV = useTransform(scrollYProgress, [0, 1], [0, total - 1]);
-
-  useMotionValueEvent(indexMV, "change", (latest) => {
-    const rounded = Math.round(latest);
-    if (rounded !== activeIndex && rounded >= 0 && rounded < total) {
-      setActiveIndex(rounded);
-    }
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    const segment = 1 / total;
+    const index = Math.min(total - 1, Math.floor(latest / segment));
+    if (index !== activeIndex) setActiveIndex(index);
   });
-
-  const panelY = useTransform(scrollYProgress, [0, 1], ["0%", "6%"]);
 
   const reveal = useTransform(
     scrollYProgress,
@@ -36,9 +31,10 @@ export default function CaseStudySection() {
     { clamp: true }
   );
 
-  const clipPathMV = useTransform(reveal, (v) => {
-    return `inset(${v}% 0% 0% 0%)`;
-  });
+  const clipPathMV = useTransform(
+    reveal,
+    (v) => `inset(${v}% 0% 0% 0%)`
+  );
 
   const current = caseStudies[activeIndex];
   const next = caseStudies[activeIndex + 1];
@@ -47,113 +43,85 @@ export default function CaseStudySection() {
     <section
       ref={sectionRef}
       className="relative bg-black"
-      style={{ height: `${(total + 1) * 100}vh` }}
+      style={{ height: `${total * 70}vh` }}
     >
-      {/* STICKY WRAPPER */}
       <div className="sticky top-0 h-screen px-4 lg:px-6">
         <div
           className="
             max-w-[2200px] mx-auto
-            grid grid-cols-1 lg:grid-cols-[1.25fr_2fr]
-            gap-12 xl:gap-16
+            grid grid-cols-1 lg:grid-cols-[1.15fr_2fr]
+            gap-10
             h-full items-center
           "
         >
-          {/* LEFT PANEL — MATCH IMAGE HEIGHT */}
-          <motion.div
-            style={{ y: panelY }}
+          {/* LEFT PANEL — LOCKED */}
+          <div
             className="
               relative
-              h-[720px] xl:h-[820px]
-              bg-black/85
+              h-[560px] xl:h-[600px]
+              bg-black
               border border-white/15
-              rounded-xl
-              p-16 xl:p-18
-              backdrop-blur
+              p-12 xl:p-14
               shadow-[0_30px_90px_rgba(0,0,0,0.75)]
               flex flex-col justify-between
             "
           >
-            {/* TOP SECTION */}
             <div>
-              {/* PROJECT LIST */}
-              <div className="flex justify-between mb-16">
-                <div className="space-y-3 text-base">
+              <div className="flex justify-between mb-12">
+                <div className="space-y-3 text-sm">
                   {caseStudies.map((p, i) => (
                     <div
                       key={p.id}
-                      className={`flex items-center gap-3 transition-opacity duration-300 ${
+                      className={`flex items-center gap-3 ${
                         activeIndex === i ? "opacity-100" : "opacity-40"
                       }`}
                     >
-                      <span className="w-2.5 h-2.5 bg-zinthOrange rounded-full" />
+                      <span className="w-2 h-2 bg-zinthOrange" />
                       {p.id.toUpperCase()}
                     </div>
                   ))}
                 </div>
 
-                <span className="text-zinthOrange text-base">
+                <span className="text-zinthOrange text-sm">
                   All Projects ↗
                 </span>
               </div>
 
-              {/* CONTENT */}
-              <div className="relative min-h-[460px]">
+              <div className="relative min-h-[360px]">
                 {caseStudies.map((project, i) => (
                   <motion.div
                     key={project.id}
                     className="absolute inset-0"
-                    initial={false}
                     animate={{
                       opacity: activeIndex === i ? 1 : 0,
-                      y: activeIndex === i ? 0 : 28,
+                      y: activeIndex === i ? 0 : 20,
                     }}
-                    transition={{ duration: 0.45, ease: "easeOut" }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
                   >
-                    {/* LABEL */}
-                    <div
-                      className="mb-6 text-white/50"
-                      style={{
-                        fontFamily: "Shadows Into Light",
-                        fontSize: "1.6rem",
-                        letterSpacing: "0.1em",
-                      }}
-                    >
+                    <div className="mb-4 text-white/50 uppercase tracking-widest text-xs">
                       {project.label}
                     </div>
 
-                    {/* TITLE — BIGGER */}
-                    <h3
-                      className="text-white mb-12"
-                      style={{
-                        fontFamily: "ClashDisplay",
-                        fontSize: "clamp(3.4rem, 4.6vw, 4.4rem)",
-                        lineHeight: "1.05",
-                        letterSpacing: "-0.02em",
-                      }}
-                    >
+                    <h3 className="text-white text-3xl leading-tight mb-8">
                       {project.title}
                     </h3>
 
-                    {/* META */}
-                    <div className="space-y-5 text-base text-white/60 border-t border-white/10 pt-8">
+                    <div className="space-y-4 text-xs text-white/60 border-t border-white/10 pt-5">
                       <div className="flex justify-between">
                         <span>Year</span>
                         <span className="text-white">{project.year}</span>
                       </div>
-
                       <div className="flex justify-between">
                         <span>Timeline</span>
                         <span className="text-white">{project.timeline}</span>
                       </div>
-
                       <div className="flex justify-between">
                         <span>Services</span>
-                        <div className="flex gap-3 flex-wrap justify-end">
+                        <div className="flex gap-2 flex-wrap justify-end">
                           {project.services.map((s) => (
                             <span
                               key={s}
-                              className="px-4 py-1.5 rounded-full bg-white/5 text-white text-sm"
+                              className="px-2.5 py-1 bg-white/5 text-white text-[11px]"
                             >
                               {s}
                             </span>
@@ -166,47 +134,35 @@ export default function CaseStudySection() {
               </div>
             </div>
 
-            {/* CTA — BOTTOM ALIGNED */}
             <a
               href="#"
               className="
-                mt-12 inline-flex items-center justify-between
-                w-full px-8 py-5
-                rounded-lg
+                -mt-4 flex justify-between items-center
+                w-full px-5 py-3
                 border border-white/30
-                text-white text-base
+                text-white text-sm
                 hover:bg-white/5
-                hover:border-white/50
                 transition
               "
             >
               <span>Read Case Study</span>
               <span>↗</span>
             </a>
-          </motion.div>
+          </div>
 
-          {/* RIGHT IMAGE PANEL */}
-          <div
-            className="
-              relative
-              h-[720px] xl:h-[820px]
-              rounded-xl
-              overflow-hidden
-              shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]
-            "
-          >
+          {/* RIGHT IMAGE */}
+          <div className="relative h-[560px] xl:h-[600px] overflow-hidden">
             {current && (
               <img
                 src={current.image}
-                alt={current.id}
+                alt=""
                 className="absolute inset-0 w-full h-full object-cover"
               />
             )}
-
             {next && (
               <motion.img
                 src={next.image}
-                alt={next.id}
+                alt=""
                 className="absolute inset-0 w-full h-full object-cover"
                 style={{ clipPath: clipPathMV }}
               />

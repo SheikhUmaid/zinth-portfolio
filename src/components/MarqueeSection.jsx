@@ -1,20 +1,16 @@
 export default function MarqueeSection() {
   return (
-    <section className="relative bg-black overflow-hidden py-20">
-      {/* Top subtle divider */}
-      <div className="absolute top-0 left-0 w-full h-px bg-white/10" />
-      <div className="absolute bottom-0 left-0 w-full h-px bg-white/10" />
+    <section className="relative bg-black overflow-hidden py-2 my-10">
+      {/* Borders */}
+      <div className="absolute top-0 left-0 w-full h-px bg-white/20" />
+      <div className="absolute bottom-0 left-0 w-full h-px bg-white/20" />
 
-      {/* MARQUEE */}
       <div className="relative w-full overflow-hidden">
-        <div className="marquee flex w-max items-center gap-24">
-          
-          {/* ITEM */}
+        <div className="marquee flex w-max items-center gap-24 ">
           <MarqueeItem />
           <MarqueeItem />
           <MarqueeItem />
           <MarqueeItem />
-
         </div>
       </div>
     </section>
@@ -36,21 +32,32 @@ function MarqueeItem() {
         Top Picks
       </span>
 
-      {/* WORKS */}
+      {/* WORKS + (03) */}
       <span
-        className="uppercase text-white font-black"
+        className="relative uppercase text-white font-black"
         style={{
           fontFamily: "ClashDisplay",
-          fontSize: "clamp(4rem, 10vw, 8rem)",
-          letterSpacing: "-0.06em",
+          fontSize: "clamp(3.6rem, 9vw, 7.4rem)",
+          letterSpacing: "-0.05em",
           whiteSpace: "nowrap",
         }}
       >
-        Works
-      </span>
+        WORKS
 
-      {/* (03) */}
-      <span className="text-white/50 text-lg font-medium">(03)</span>
+        {/* (03) */}
+        <span
+  className="absolute text-white/30 font-light"
+  style={{
+    fontSize: "0.18em",
+    top: "0.12em",
+    right: "-1.15em",
+    letterSpacing: "0.05em",
+  }}
+>
+  (03)
+</span>
+
+      </span>
     </div>
   );
 }
